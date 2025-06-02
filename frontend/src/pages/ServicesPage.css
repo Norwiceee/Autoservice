@@ -1,0 +1,119 @@
+.services-bg {
+    min-height: 100vh;
+    background: linear-gradient(120deg, #e0eaff 0%, #f8fcff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 0;
+}
+
+.services-glass {
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(120,145,220,0.13), 0 1.5px 4px #c8d6fa2c;
+    padding: 32px 28px 24px;
+    margin: 0 12px;
+}
+
+.services-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #2a3550;
+    margin-bottom: 22px;
+}
+
+.services-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 26px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.services-input {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 13px;
+    font-size: 16px;
+    border: 1px solid #d4e0f6;
+    border-radius: 7px;
+    background: #f5f8fc;
+    transition: border-color 0.2s;
+}
+.services-input:focus {
+    border-color: #6290ff;
+    outline: none;
+    background: #f1f8fe;
+}
+
+.services-btn {
+    padding: 9px 22px;
+    background: linear-gradient(90deg, #4d7fff 60%, #72b3ff 100%);
+    border: none;
+    color: #fff;
+    border-radius: 7px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.17s;
+}
+.services-btn:disabled {
+    background: #b1c3e6;
+    cursor: not-allowed;
+}
+
+.services-success {
+    color: #1e7045;
+    background: #eafaf2;
+    border: 1px solid #c0ecd5;
+    border-radius: 7px;
+    padding: 9px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+}
+.services-error {
+    color: #842029;
+    background: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 7px;
+    padding: 9px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+.services-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    background: #fff;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.services-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 350px;
+}
+
+.services-table th, .services-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 15.5px;
+}
+
+.services-table th {
+    background: #f6f8fa;
+    font-weight: 600;
+    color: #40507e;
+    font-size: 16.2px;
+    letter-spacing: 0.01em;
+}
+
+.empty-row {
+    color: #97a1b6;
+    text-align: center;
+    padding: 18px 0;
+}

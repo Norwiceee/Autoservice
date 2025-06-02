@@ -1,0 +1,70 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.Python
+env/
+venv/
+ENV/
+.venv/
+pip-log.txt
+
+# VSCode/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+log/
+*.pid
+
+# Env files
+.env
+.env.*
+
+# Build
+dist/
+build/
+out/
+coverage/
+*.egg-info/
+.eggs/
+
+# Git
+.git/
+.gitignore
+
+# Test output
+*.cover
+coverage.xml
+nosetests.xml
+test-results/
+*.pytest_cache/
+
+# Other
+*.swp
+*.bak
+*.tmp
+*.orig

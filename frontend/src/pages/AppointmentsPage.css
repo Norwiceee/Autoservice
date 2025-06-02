@@ -1,0 +1,113 @@
+.appointments-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #f9fbff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+h2 {
+    font-weight: 700;
+    margin-bottom: 24px;
+    font-size: 28px;
+    color: #1a2a5a;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #842029;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.appointment-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.appointment-form select,
+.appointment-form input[type="date"] {
+    flex: 1 1 150px;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1.5px solid #cbd5e1;
+    background: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.appointment-form select:focus,
+.appointment-form input[type="date"]:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 5px #4f46e5aa;
+}
+
+.appointment-form button {
+    background-color: #4f46e5;
+    color: #fff;
+    font-weight: 700;
+    padding: 12px 22px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.3s ease;
+}
+
+.appointment-form button:disabled {
+    background-color: #a5b4fc;
+    cursor: not-allowed;
+}
+
+.appointment-form button:hover:not(:disabled) {
+    background-color: #3730a3;
+}
+
+.appointments-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    font-size: 16px;
+    color: #444;
+}
+
+.appointments-table th,
+.appointments-table td {
+    padding: 12px 18px;
+    text-align: left;
+}
+
+.appointments-table thead th {
+    background-color: #e0e7ff;
+    font-weight: 700;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.appointments-table tbody tr {
+    background-color: #fff;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.05);
+    border-radius: 12px;
+}
+
+.appointments-table tbody tr td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.empty-row {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px 0;
+}

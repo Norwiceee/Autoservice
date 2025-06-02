@@ -1,0 +1,101 @@
+/* src/pages/PartsPage.css */
+.page-glass {
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    border-radius: 16px;
+    padding: 32px 32px 24px 32px;
+    margin: 32px auto;
+    max-width: 960px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #2d354a;
+}
+
+.add-form {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.add-form input, .add-form select {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #d5dbe7;
+    background: #f7faff;
+    font-size: 1rem;
+    min-width: 160px;
+    outline: none;
+    transition: border .2s;
+}
+.add-form input:focus, .add-form select:focus {
+    border: 1.5px solid #4186f7;
+}
+
+.add-form button {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg, #4186f7 0%, #6fbaf8 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+}
+.add-form button:hover {
+    background: linear-gradient(90deg, #2962d2 0%, #36a3f7 100%);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 16px rgba(31,38,135,0.07);
+}
+
+thead {
+    background: #f3f6fa;
+}
+th, td {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 1rem;
+}
+th {
+    color: #4186f7;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+tr:not(:last-child) {
+    border-bottom: 1px solid #e7ebf2;
+}
+
+tr:nth-child(even) {
+    background: #f9fcff;
+}
+
+.error-message {
+    color: #e63c3c;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.success-message {
+    color: #24b47e;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 500;
+}
