@@ -26,18 +26,19 @@ export interface Car {
 
 export interface Service {
     id: number;
-    name: string;                // обязательно name, не title
-    description?: string;
+    name: string;
     price: number;
+    category_id: number;
+    duration?: number | string;
 }
 
 export interface Appointment {
     id: number;
-    clientId: number;
-    carId: number;
-    serviceId: number;
-    date?: string;                // alias для удобства (можно использовать в приложении)
-    appointment_date?: string;    // дата из БД (timestamp)
+    client_id: number;
+    car_id: number;
+    service_id: number;
+    appointment_date: string;
+    status: string;
     created_at?: string;
 }
 
@@ -54,12 +55,11 @@ export interface Employee {
 export interface Part {
     id: number;
     name: string;
-    category_id: number;
     sku: string;
-    stock_qty: number; // ← Добавь это!
+    stock_qty: number;
     purchase_price: number;
     sale_price: number;
-    price: number;
+    car_id: number;
 }
 
 export interface Category {
@@ -117,4 +117,19 @@ export interface Employee {
     phone?: string;
     email?: string;
 }
+
+export interface Car {
+    id: number;
+    client_id: number;
+    make: string;
+    model: string;
+    year?: number;
+    license_plate?: string;
+    vin?: string;
+    color?: string;
+    mileage?: number;
+    status?: string;
+}
+
+
 

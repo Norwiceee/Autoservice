@@ -1,14 +1,17 @@
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 import asyncpg
+from typing import Optional
 
 router = APIRouter()
 
 class ClientModel(BaseModel):
     first_name: str
     last_name: str
-    phone: str = None
-    email: str = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    client_type: Optional[str] = None
+    discount: Optional[float] = 0.0
 
 @router.post("/clients", summary="Регистрация клиента")
 async def create_client(client: ClientModel, request: Request):
@@ -16,19 +19,23 @@ async def create_client(client: ClientModel, request: Request):
     async with pool.acquire() as conn:
         try:
             result = await conn.fetchrow(
-                "INSERT INTO clients (first_name, last_name, phone, email) VALUES ($1, $2, $3, $4) "
-                "RETURNING id, first_name, last_name, phone, email, created_at",
-                client.first_name, client.last_name, client.phone, client.email
+                """
+                INSERT INTO clients (first_name, last_name, phone, email, client_type, discount)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                RETURNING id, first_name, last_name, phone, email, client_type, discount, created_at
+                """,
+                client.first_name, client.last_name, client.phone, client.email, client.client_type, client.discount
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return dict(result)
 
+
 @router.get("/clients", summary="Список клиентов")
 async def get_clients(request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT id, first_name, last_name, phone, email, created_at FROM clients")
+        rows = await conn.fetch("SELECT id, first_name, last_name, phone, email, client_type, discount, created_at FROM clients")
     return [dict(row) for row in rows]
 
 @router.get("/clients/{client_id}", summary="Информация о клиенте и история обслуживаний")
@@ -36,7 +43,7 @@ async def get_client(client_id: int, request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
         client = await conn.fetchrow(
-            "SELECT id, first_name, last_name, phone, email, created_at FROM clients WHERE id=$1",
+            "SELECT id, first_name, last_name, phone, email, client_type, discount, created_at FROM clients WHERE id=$1",
             client_id
         )
         if not client:

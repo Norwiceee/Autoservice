@@ -1,124 +1,136 @@
 import React, { useEffect, useState } from "react";
-import { Service } from "../types";
-import * as api from "../api";
+import { Service, Category } from "../types";
+import { getServices, createService, getCategories } from '../api';
 import "./ServicesPage.css";
 
 const ServicesPage: React.FC = () => {
-    const [services, setServices] = useState<Array<any>>([]);
-    const [categories, setCategories] = useState<Array<any>>([]);
+    const [services, setServices] = useState<Service[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [duration, setDuration] = useState('');
-    const [categoryId, setCategoryId] = useState('');
-    const [errorName, setErrorName] = useState('');
-    const [errorPrice, setErrorPrice] = useState('');
-    const [submitError, setSubmitError] = useState('');
+    const [categoryId, setCategoryId] = useState<number | ''>('');
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('/services')
-            .then(res => res.json())
-            .then(data => setServices(data))
-            .catch(err => console.error(err));
-        fetch('/service_categories')
-            .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch(err => console.error(err));
+        getServices().then(setServices).catch(() => setError("Ошибка загрузки услуг"));
+        getCategories().then(setCategories).catch(() => setError("Ошибка загрузки категорий"));
     }, []);
 
-    const addService = () => {
+    const handleAddService = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setSuccess(null);
         if (!name.trim()) {
-            setErrorName('Название услуги обязательно');
+            setError("Название услуги обязательно");
             return;
         }
-        setErrorName('');
         const priceNum = parseFloat(price);
         if (isNaN(priceNum) || priceNum <= 0) {
-            setErrorPrice('Цена должна быть числом больше 0');
+            setError("Цена должна быть числом больше 0");
             return;
         }
-        setErrorPrice('');
         if (!categoryId) {
-            setSubmitError('Выберите категорию');
+            setError("Выберите категорию");
             return;
         }
-        setSubmitError('');
 
-        const serviceData = {
-            name,
-            price: priceNum,
-            duration: duration ? parseInt(duration) : null,
-            categoryId: parseInt(categoryId)
-        };
-        fetch('/services', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(serviceData)
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Ошибка при добавлении услуги');
-                return res.json();
-            })
-            .then(newService => {
-                setServices([...services, newService]);
-                setName(''); setPrice(''); setDuration(''); setCategoryId('');
-            })
-            .catch(err => setSubmitError(err.message));
+        try {
+            const newService = await createService(
+                name,
+                priceNum,
+                undefined,
+                Number(categoryId),
+                duration ? duration : undefined
+            );
+            setServices(prev => [...prev, newService]);
+            setName(''); setPrice(''); setDuration(''); setCategoryId('');
+            setSuccess("Услуга добавлена!");
+            setTimeout(() => setSuccess(null), 2000);
+        } catch (err: any) {
+            setError(err.message || 'Ошибка при добавлении услуги');
+        }
     };
 
     return (
-        <div>
-            <h2>Услуги</h2>
-
-            <div>
-                <h3>Добавить новую услугу</h3>
-                <label>Название:</label><br/>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} /><br/>
-                {errorName && <span style={{color:'red'}}>{errorName}</span>}<br/>
-
-                <label>Цена:</label><br/>
-                <input type="text" value={price} onChange={e => setPrice(e.target.value)} /><br/>
-                {errorPrice && <span style={{color:'red'}}>{errorPrice}</span>}<br/>
-
-                <label>Продолжительность (мин):</label><br/>
-                <input type="number" value={duration} onChange={e => setDuration(e.target.value)} /><br/>
-
-                <label>Категория:</label><br/>
-                <select value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-                    <option value="">Выберите категорию</option>
+        <div className="page-glass">
+            <h2 className="page-title">Услуги</h2>
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            <form className="add-form" onSubmit={handleAddService}>
+                <input
+                    type="text"
+                    placeholder="Название услуги"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Цена"
+                    min={1}
+                    step="0.01"
+                    value={price}
+                    onChange={e => setPrice(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Продолжительность (мин)"
+                    min={1}
+                    value={duration}
+                    onChange={e => setDuration(e.target.value)}
+                />
+                <select
+                    value={categoryId}
+                    onChange={e => setCategoryId(e.target.value === '' ? '' : Number(e.target.value))}
+                    required
+                >
+                    <option value="">Категория</option>
                     {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
-                </select><br/>
-
-                <button onClick={addService}>Добавить услугу</button><br/>
-                {submitError && <span style={{color:'red'}}>{submitError}</span>}
-            </div>
-
-            <h3>Список услуг</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th><th>Название</th><th>Цена</th><th>Длительность</th><th>Категория</th>
-                </tr>
-                </thead>
-                <tbody>
-                {services.map(service => {
-                    const category = categories.find(c => c.id === service.categoryId);
-                    return (
-                        <tr key={service.id}>
-                            <td>{service.id}</td>
-                            <td>{service.name}</td>
-                            <td>{service.price}</td>
-                            <td>{service.duration}</td>
-                            <td>{category ? category.name : ''}</td>
+                </select>
+                <button type="submit">Добавить услугу</button>
+            </form>
+            <div className="table-wrap">
+                <table className="glass-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Длительность</th>
+                        <th>Категория</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {services.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} style={{ textAlign: "center", color: "#888", padding: 16 }}>
+                                Нет услуг
+                            </td>
                         </tr>
-                    );
-                })}
-                </tbody>
-            </table>
+                    ) : (
+                        services.map(service => {
+                            const category = categories.find(c => c.id === service.category_id);
+                            return (
+                                <tr key={service.id}>
+                                    <td>{service.id}</td>
+                                    <td>{service.name}</td>
+                                    <td>{service.price}</td>
+                                    <td>{service.duration || "—"}</td>
+                                    <td>{category ? category.name : "—"}</td>
+                                </tr>
+                            );
+                        })
+                    )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
 
 export default ServicesPage;
-

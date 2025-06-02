@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { getReviews, createReview, getClients, getServices } from "../api";
 import { Review, Client, Service } from "../types";
 import "./ReviewsPage.css";
+import { getAppointments } from "../api";
+import { Appointment } from "../types";
 
 const ReviewsPage: React.FC = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -15,11 +17,13 @@ const ReviewsPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [appointmentId, setAppointmentId] = useState('');
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
 
     useEffect(() => {
         getReviews().then(setReviews).catch(() => setError("Ошибка загрузки отзывов"));
         getClients().then(setClients).catch(() => setError("Ошибка загрузки клиентов"));
         getServices().then(setServices).catch(() => setError("Ошибка загрузки услуг"));
+        getAppointments().then(setAppointments).catch(() => setError("Ошибка загрузки записей"));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +31,13 @@ const ReviewsPage: React.FC = () => {
         setError(null);
         setLoading(true);
         try {
-            const newReview = await createReview(Number(appointmentId), Number(rating), comment);
+            const newReview = await createReview(
+                Number(appointmentId),
+                Number(clientId),
+                Number(serviceId),
+                Number(rating),
+                comment
+            );
             setReviews(prev => [...prev, newReview]);
             setAppointmentId(""); setRating(""); setComment("");
         } catch (e: any) {
@@ -52,6 +62,20 @@ const ReviewsPage: React.FC = () => {
                     {clients.map(client => (
                         <option key={client.id} value={client.id}>
                             {client.first_name} {client.last_name}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    value={appointmentId}
+                    onChange={e => setAppointmentId(e.target.value)}
+                    required
+                >
+                    <option value="">Выберите запись</option>
+                    {appointments.map(appt => (
+                        <option key={appt.id} value={appt.id}>
+                            {appt.id} — {appt.appointment_date
+                            ? new Date(appt.appointment_date).toLocaleString()
+                            : ""}
                         </option>
                     ))}
                 </select>

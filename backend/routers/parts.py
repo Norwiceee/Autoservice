@@ -10,38 +10,36 @@ router = APIRouter(
 )
 
 class PartModel(BaseModel):
-    name: constr(min_length=1)
-    description: Optional[str] = None
-    price: float
-    quantity_in_stock: int
+    name: str
+    sku: str
+    stock_qty: int
+    purchase_price: float
+    sale_price: float
+    car_id: int
 
 class PartDB(PartModel):
     id: int
 
-@router.post("/", response_model=PartDB, summary="Добавить новую запчасть")
+@router.post("/", summary="Создать запчасть")
 async def create_part(part: PartModel, request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
         try:
-            row = await conn.fetchrow(
-                """
-                INSERT INTO parts (name, description, price, quantity_in_stock)
-                VALUES ($1, $2, $3, $4)
-                RETURNING id, name, description, price, quantity_in_stock
-                """,
-                part.name, part.description, part.price, part.quantity_in_stock
+            result = await conn.fetchrow(
+                "INSERT INTO parts (name, sku, stock_qty, purchase_price, sale_price, car_id) "
+                "VALUES ($1, $2, $3, $4, $5, $6) "
+                "RETURNING id, name, sku, stock_qty, purchase_price, sale_price, car_id",
+                part.name, part.sku, part.stock_qty, part.purchase_price, part.sale_price, part.car_id
             )
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Ошибка при добавлении запчасти: {str(e)}")
-    return dict(row)
+            raise HTTPException(status_code=400, detail=str(e))
+    return dict(result)
 
-@router.get("/", response_model=List[PartDB], summary="Получить список запчастей")
+@router.get("/", summary="Список запчастей")
 async def get_parts(request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            "SELECT id, name, description, price, quantity_in_stock FROM parts ORDER BY id"
-        )
+        rows = await conn.fetch("SELECT id, name, sku, stock_qty, purchase_price, sale_price, car_id FROM parts")
     return [dict(row) for row in rows]
 
 @router.get("/{part_id}", response_model=PartDB, summary="Получить запчасть по ID")
@@ -49,7 +47,7 @@ async def get_part(part_id: int, request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
         part = await conn.fetchrow(
-            "SELECT id, name, description, price, quantity_in_stock FROM parts WHERE id = $1",
+            "SELECT id, name, sku, stock_qty, purchase_price, sale_price, car_id FROM parts WHERE id = $1",
             part_id
         )
         if not part:
@@ -66,13 +64,13 @@ async def update_part(part_id: int, part: PartModel, request: Request):
         await conn.execute(
             """
             UPDATE parts
-            SET name=$1, description=$2, price=$3, quantity_in_stock=$4
-            WHERE id=$5
+            SET name=$1, sku=$2, stock_qty=$3, purchase_price=$4, sale_price=$5, car_id=$6
+            WHERE id=$7
             """,
-            part.name, part.description, part.price, part.quantity_in_stock, part_id
+            part.name, part.sku, part.stock_qty, part.purchase_price, part.sale_price, part.car_id, part_id
         )
         updated = await conn.fetchrow(
-            "SELECT id, name, description, price, quantity_in_stock FROM parts WHERE id = $1",
+            "SELECT id, name, sku, stock_qty, purchase_price, sale_price, car_id FROM parts WHERE id = $1",
             part_id
         )
     return dict(updated)

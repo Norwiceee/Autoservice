@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel, constr
 from typing import List, Optional
 from routers.auth import get_current_user
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/categories",
@@ -40,7 +41,7 @@ async def get_categories(request: Request):
         rows = await conn.fetch(
             "SELECT id, name, description FROM categories ORDER BY id"
         )
-    return [dict(row) for row in rows]
+    return JSONResponse(content=[dict(row) for row in rows])
 
 @router.get("/{category_id}", response_model=CategoryDB, summary="Получить категорию по ID")
 async def get_category(category_id: int, request: Request):

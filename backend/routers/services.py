@@ -9,6 +9,8 @@ class ServiceModel(BaseModel):
     name: str
     description: str = None
     price: float
+    category_id: int
+    duration: int = None
 
 @router.post("/services", summary="Создание услуги")
 async def create_service(service: ServiceModel, request: Request):
@@ -16,19 +18,25 @@ async def create_service(service: ServiceModel, request: Request):
     async with pool.acquire() as conn:
         try:
             result = await conn.fetchrow(
-                "INSERT INTO services (name, description, price) VALUES ($1, $2, $3) RETURNING id, name, description, price",
-                service.name, service.description, service.price
+                """
+                INSERT INTO services (name, description, price, category_id, duration)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING id, name, description, price, category_id, duration
+                """,
+                service.name, service.description, service.price, service.category_id, service.duration
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return dict(result)
 
+
 @router.get("/services", summary="Список услуг")
 async def get_services(request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT id, name, description, price FROM services")
+        rows = await conn.fetch("SELECT id, name, description, price, category_id, duration FROM services")
     return [dict(row) for row in rows]
+
 
 @router.get("/services/{service_id}", summary="Получить услугу")
 async def get_service(service_id: int, request: Request):

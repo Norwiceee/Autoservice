@@ -38,7 +38,7 @@ CREATE TABLE services (
                           name TEXT NOT NULL,
                           description TEXT,
                           price NUMERIC(10,2) NOT NULL,
-                          duration INTERVAL -- например '01:30:00'
+                          duration INTEGER  -- продолжительность в минутах
 );
 
 -- Таблица сотрудников автосервиса
@@ -67,13 +67,11 @@ CREATE TABLE appointments (
 CREATE TABLE parts (
                        id SERIAL PRIMARY KEY,
                        name TEXT NOT NULL,
-                       sku TEXT UNIQUE,
-                       quantity_in_stock INTEGER DEFAULT 0, -- это новое поле!
-                       stock_qty INTEGER DEFAULT 0,
-                       purchase_price NUMERIC(10,2),
-                       sale_price NUMERIC(10,2),
-                       price NUMERIC(10,2),
-                       description TEXT
+                       sku TEXT NOT NULL,
+                       stock_qty INTEGER NOT NULL,
+                       purchase_price NUMERIC(10, 2) NOT NULL,
+                       sale_price NUMERIC(10, 2) NOT NULL,
+                       car_id INTEGER REFERENCES cars(id) -- добавлено!
 );
 
 
@@ -99,6 +97,8 @@ CREATE TABLE payments (
 CREATE TABLE reviews (
                          id SERIAL PRIMARY KEY,
                          appointment_id INTEGER NOT NULL REFERENCES appointments(id) ON DELETE CASCADE,
+                         client_id INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+                         service_id INTEGER REFERENCES services(id), -- ← добавлено поле service_id!
                          rating INTEGER CHECK (rating >= 1 AND rating <= 5),
                          comment TEXT,
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

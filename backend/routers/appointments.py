@@ -10,6 +10,7 @@ class AppointmentModel(BaseModel):
     car_id: int
     service_id: int
     appointment_date: datetime
+    status: str
 
 @router.post("/appointments", summary="Запись на обслуживание")
 async def create_appointment(appointment: AppointmentModel, request: Request):
@@ -17,10 +18,10 @@ async def create_appointment(appointment: AppointmentModel, request: Request):
     async with pool.acquire() as conn:
         try:
             result = await conn.fetchrow(
-                "INSERT INTO appointments (client_id, car_id, service_id, appointment_date) "
-                "VALUES ($1, $2, $3, $4) "
-                "RETURNING id, client_id, car_id, service_id, appointment_date",
-                appointment.client_id, appointment.car_id, appointment.service_id, appointment.appointment_date
+                "INSERT INTO appointments (client_id, car_id, service_id, appointment_date, status) "
+                "VALUES ($1, $2, $3, $4, $5) "
+                "RETURNING id, client_id, car_id, service_id, appointment_date, status",
+                appointment.client_id, appointment.car_id, appointment.service_id, appointment.appointment_date, appointment.status
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -31,7 +32,7 @@ async def get_appointments(request: Request):
     pool = request.app.state.pool
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT id, client_id, car_id, service_id, appointment_date FROM appointments"
+            "SELECT id, client_id, car_id, service_id, appointment_date, status FROM appointments"
         )
     return [dict(row) for row in rows]
 

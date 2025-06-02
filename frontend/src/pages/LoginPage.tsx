@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 import React, { useState } from "react";
 import { login as apiLogin } from "../api";
 import { useNavigate } from "react-router-dom";
@@ -29,38 +28,34 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="auth-bg">
-            <div className="auth-glass">
-                <h2 className="auth-title">Вход в автосервис</h2>
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <div className="auth-input-wrapper">
-                        <input
-                            className="auth-input"
-                            type="text"
-                            placeholder="Логин"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                            autoFocus
-                            required
-                        />
-                    </div>
-                    <div className="auth-input-wrapper">
-                        <input
-                            className="auth-input"
-                            type="password"
-                            placeholder="Пароль"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+        <div className="page-glass auth-bg">
+            <div className="glass-card auth-glass">
+                <h2 className="page-title auth-title">Вход в автосервис</h2>
+                <form className="add-form auth-form" onSubmit={handleSubmit}>
+                    <input
+                        className="auth-input"
+                        type="text"
+                        placeholder="Логин"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                        autoFocus
+                        required
+                    />
+                    <input
+                        className="auth-input"
+                        type="password"
+                        placeholder="Пароль"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                    />
                     <button className="auth-btn" type="submit" disabled={loading}>
                         {loading ? "Вход..." : "Войти"}
                     </button>
-                    {error && <div className="auth-error">{error}</div>}
+                    {error && <div className="error-message auth-error">{error}</div>}
                 </form>
                 <div className="auth-switch">
-                    Нет аккаунта?
+                    Нет аккаунта?{" "}
                     <span className="auth-link" onClick={() => navigate("/register")}>
                         Зарегистрироваться
                     </span>

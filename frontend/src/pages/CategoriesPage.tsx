@@ -13,47 +13,50 @@ const CategoriesPage: React.FC = () => {
     useEffect(() => {
         api.getCategories()
             .then(setCategories)
-            .catch(() => setError("Ошибка при загрузке категорий."));
+            .catch(() => setError("Ошибка загрузки категорий"));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name) {
+        setError(null);
+        setMessage(null);
+        if (!name.trim()) {
             setError("Введите название категории");
             return;
         }
         setLoading(true);
         try {
-            const newCategory = await api.createCategory(name);
-            setCategories([...categories, newCategory]);
+            const newCategory = await api.createCategory(name.trim());
+            setCategories(prev => [...prev, newCategory]);
             setName("");
             setMessage("Категория добавлена!");
-            setError(null);
         } catch {
             setError("Ошибка добавления категории");
+        } finally {
+            setLoading(false);
+            setTimeout(() => setMessage(null), 2000);
         }
-        setLoading(false);
-        setTimeout(() => setMessage(null), 2000);
     };
 
     return (
-        <div className="glass-bg">
-            <div className="glass-card">
-                <h2 className="page-title">Категории</h2>
-                {message && <div className="success-msg">{message}</div>}
-                {error && <div className="error-msg">{error}</div>}
-
-                <form className="flex-form" onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Название"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                    />
-                    <button type="submit" disabled={loading}>{loading ? "Добавление..." : "Добавить"}</button>
-                </form>
-
-                <table className="main-table">
+        <div className="page-glass">
+            <h2 className="page-title">Категории</h2>
+            {message && <div className="success-message">{message}</div>}
+            {error && <div className="error-message">{error}</div>}
+            <form className="add-form" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Название"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    required
+                />
+                <button type="submit" disabled={loading}>
+                    {loading ? "Добавление..." : "Добавить"}
+                </button>
+            </form>
+            <div className="table-wrap">
+                <table className="glass-table">
                     <thead>
                     <tr>
                         <th>ID</th>
@@ -63,14 +66,18 @@ const CategoriesPage: React.FC = () => {
                     <tbody>
                     {categories.length === 0 ? (
                         <tr>
-                            <td colSpan={2} style={{ textAlign: "center", color: "#666" }}>Нет категорий</td>
+                            <td colSpan={2} style={{ textAlign: "center", color: "#888", padding: 16 }}>
+                                Нет категорий
+                            </td>
                         </tr>
-                    ) : categories.map(cat => (
-                        <tr key={cat.id}>
-                            <td>{cat.id}</td>
-                            <td>{cat.name}</td>
-                        </tr>
-                    ))}
+                    ) : (
+                        categories.map(cat => (
+                            <tr key={cat.id}>
+                                <td>{cat.id}</td>
+                                <td>{cat.name}</td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>

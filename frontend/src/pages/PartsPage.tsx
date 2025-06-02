@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { getParts, createPart, getCategories } from "../api";
-import { Part, Category } from "../types";
 import "./PartsPage.css";
+import { getParts, createPart, getCars } from "../api";
+import { Part, Car } from "../types";
 
 const PartsPage: React.FC = () => {
     const [parts, setParts] = useState<Part[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
     const [name, setName] = useState("");
-    const [categoryId, setCategoryId] = useState<number | "">("");
-    const [price, setPrice] = useState("");
-    const [quantityInStock, setQuantityInStock] = useState("");
     const [sku, setSku] = useState("");
+    const [quantityInStock, setQuantityInStock] = useState("");
     const [purchasePrice, setPurchasePrice] = useState("");
     const [salePrice, setSalePrice] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [carId, setCarId] = useState<number | "">("");
+    const [cars, setCars] = useState<Car[]>([]);
 
     useEffect(() => {
         getParts().then(setParts).catch(() => setError("Ошибка загрузки запчастей"));
-        getCategories().then(setCategories).catch(() => setError("Ошибка загрузки категорий"));
+        getCars().then(setCars).catch(() => setError("Ошибка загрузки автомобилей"));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -30,12 +29,13 @@ const PartsPage: React.FC = () => {
             const newPart = await createPart(
                 name,
                 sku,
-                Number(stock_qty),
+                Number(quantityInStock),
                 Number(purchasePrice),
-                Number(salePrice)
+                Number(salePrice),
+                Number(carId)
             );
             setParts(prev => [...prev, newPart]);
-            setName(""); setSku(""); setQuantityInStock(""); setPurchasePrice(""); setSalePrice(""); setPrice(""); setCategoryId("");
+            setName(""); setSku(""); setQuantityInStock(""); setPurchasePrice(""); setSalePrice(""); setCarId("");
             setSuccess("Запчасть добавлена!");
             setTimeout(() => setSuccess(null), 2000);
         } catch (e: any) {
@@ -64,16 +64,6 @@ const PartsPage: React.FC = () => {
                     value={sku}
                     onChange={e => setSku(e.target.value)}
                 />
-                <select
-                    value={categoryId}
-                    onChange={e => setCategoryId(Number(e.target.value))}
-                    required
-                >
-                    <option value="">Категория</option>
-                    {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                </select>
                 <input
                     type="number"
                     placeholder="Количество на складе"
@@ -97,15 +87,18 @@ const PartsPage: React.FC = () => {
                     value={salePrice}
                     onChange={e => setSalePrice(e.target.value)}
                 />
-                <input
-                    type="number"
-                    placeholder="Цена"
-                    min={0}
-                    step="0.01"
-                    value={price}
-                    onChange={e => setPrice(e.target.value)}
+                <select
+                    value={carId}
+                    onChange={e => setCarId(Number(e.target.value))}
                     required
-                />
+                >
+                    <option value="">Автомобиль</option>
+                    {cars.map(car => (
+                        <option key={car.id} value={car.id}>
+                            {car.make} {car.model} ({car.license_plate})
+                        </option>
+                    ))}
+                </select>
                 <button type="submit" disabled={loading}>
                     {loading ? "Добавление..." : "Добавить"}
                 </button>
@@ -116,34 +109,35 @@ const PartsPage: React.FC = () => {
                     <tr>
                         <th>ID</th>
                         <th>Название</th>
-                        <th>Категория</th>
                         <th>SKU</th>
                         <th>На складе</th>
                         <th>Закуп. цена</th>
                         <th>Цена продажи</th>
-                        <th>Цена</th>
+                        <th>Автомобиль (модель)</th>
                     </tr>
                     </thead>
                     <tbody>
                     {parts.length === 0 ? (
                         <tr>
-                            <td colSpan={8} style={{ textAlign: "center", color: "#888", padding: 16 }}>
+                            <td colSpan={7} style={{ textAlign: "center", color: "#888", padding: 16 }}>
                                 Нет запчастей
                             </td>
                         </tr>
                     ) : (
-                        parts.map(part => (
-                            <tr key={part.id}>
-                                <td>{part.id}</td>
-                                <td>{part.name}</td>
-                                <td>{categories.find(c => c.id === part.category_id)?.name || "—"}</td>
-                                <td>{part.sku}</td>
-                                <td>{part.quantity_in_stock}</td>
-                                <td>{part.purchase_price}</td>
-                                <td>{part.sale_price}</td>
-                                <td>{part.price}</td>
-                            </tr>
-                        ))
+                        parts.map(part => {
+                            const car = cars.find(c => c.id === part.car_id);
+                            return (
+                                <tr key={part.id}>
+                                    <td>{part.id}</td>
+                                    <td>{part.name}</td>
+                                    <td>{part.sku}</td>
+                                    <td>{part.stock_qty}</td>
+                                    <td>{part.purchase_price}</td>
+                                    <td>{part.sale_price}</td>
+                                    <td>{car ? `${car.make} ${car.model}` : "—"}</td>
+                                </tr>
+                            );
+                        })
                     )}
                     </tbody>
                 </table>

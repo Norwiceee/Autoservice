@@ -64,7 +64,7 @@ export async function createClient(
 }
 
 // ----------- АВТО ------------
-export async function getCars(): Promise<Car[]> {
+export async function getCars() {
     const resp = await fetch(`${API_URL}/cars`, {
         headers: { "Authorization": `Bearer ${getToken()}` }
     });
@@ -199,7 +199,8 @@ export async function createPart(
     sku: string,
     stock_qty: number,
     purchase_price: number,
-    sale_price: number
+    sale_price: number,
+    car_id: number
 ): Promise<Part> {
     const resp = await fetch(`${API_URL}/parts`, {
         method: "POST",
@@ -207,7 +208,7 @@ export async function createPart(
             "Content-Type": "application/json",
             "Authorization": `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ name, sku, stock_qty, purchase_price, sale_price }),
+        body: JSON.stringify({ name, sku, stock_qty, purchase_price, sale_price, car_id }),
     });
     if (!resp.ok) throw new Error("Ошибка создания запчасти");
     return resp.json();
@@ -247,8 +248,10 @@ export async function getReviews(): Promise<Review[]> {
 
 export async function createReview(
     appointment_id: number,
+    client_id: number,
+    service_id: number,
     rating: number,
-    comment?: string
+    comment: string
 ): Promise<Review> {
     const resp = await fetch(`${API_URL}/reviews`, {
         method: "POST",
@@ -256,10 +259,12 @@ export async function createReview(
             "Content-Type": "application/json",
             "Authorization": `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ appointment_id, rating, comment }),
+        body: JSON.stringify({ appointment_id, client_id, service_id, rating, comment }),
     });
     if (!resp.ok) throw new Error("Ошибка создания отзыва");
     return resp.json();
 }
+
+
 
 
